@@ -2,7 +2,6 @@
   max-width: 1380px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 .logo {
@@ -47,6 +46,17 @@
 
 .ant-card {
   border-radius: 12px !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  display: none !important;
+}
+.ant-menu-item {
+  text-align: center;
+}
+
+.ant-card-body {
+  padding: 12px !important;
 }
 
 .ant-btn-primary {
