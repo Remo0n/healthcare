@@ -14,13 +14,13 @@ const { Sider } = Layout;
 
 const Sidebar = () => {
   const menuItems = [
-    { key: '1', icon: <HomeOutlined />, label: '' },
-    { key: '2', icon: <UserOutlined />, label: '' },
-    { key: '3', icon: <TeamOutlined />, label: '' },
-    { key: '4', icon: <MessageOutlined />, label: '' },
-    { key: '5', icon: <BellOutlined />, label: '' },
-    { key: '6', icon: <SettingOutlined />, label: '' },
-    { key: '7', icon: <QuestionCircleOutlined />, label: '' },
+    { key: '1', icon: <HomeOutlined /> },
+    { key: '2', icon: <UserOutlined /> },
+    { key: '3', icon: <TeamOutlined /> },
+    { key: '4', icon: <MessageOutlined /> },
+    { key: '5', icon: <BellOutlined /> },
+    { key: '6', icon: <SettingOutlined /> },
+    { key: '7', icon: <QuestionCircleOutlined /> },
   ];
 
   return (
@@ -37,9 +37,9 @@ const Sidebar = () => {
         </div>
         <Menu
           mode="vertical"
-          selectedKeys={['3']}
+          selectedKeys={['1']}
           items={menuItems}
-          className="border-none flex-1"
+          className="border-none rounded-b-xl"
         />
       </div>
     </Sider>

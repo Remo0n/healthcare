@@ -8,7 +8,7 @@ import ConnectionsGraph from './ConnectionsGraph';
 const MainContent = ({ doctorData }) => {
   return (
     <div className="flex gap-6 h-full">
-      <div className="flex-1 space-y-6">
+      <div className="flex flex-col gap-3 flex-1 space-y-6">
         <ProfileCard doctorData={doctorData} />
         <StatsCard doctorData={doctorData} />
         <AboutSection doctorData={doctorData} />

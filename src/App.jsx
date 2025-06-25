@@ -31,7 +31,7 @@ function App() {
   return (
     <Layout className="min-h-screen bg-gray-50">
       <Sidebar />
-      <Layout className="ml-16">
+      <Layout className="ml-5">
         <Header doctorData={doctorData} />
         <Content className="py-6">
           <MainContent doctorData={doctorData} />
