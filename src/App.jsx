@@ -29,7 +29,7 @@ const doctorData = {
 
 function App() {
   return (
-    <Layout className="min-h-screen bg-gray-50">
+    <Layout className="min-h-screen">
       <Sidebar />
       <Layout className="ml-5">
         <Header doctorData={doctorData} />

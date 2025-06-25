@@ -1,9 +1,8 @@
 import React from 'react';
-import { Card } from 'antd';
 
 const EducationSection = ({ doctorData }) => {
   return (
-    <Card className="rounded-xl shadow-sm border border-gray-200">
+    <div>
       <h4 className="text-lg font-semibold text-gray-900 mb-4">Education</h4>
       {doctorData.education.map((edu, index) => (
         <div key={index} className="flex items-start space-x-3">
@@ -18,7 +17,7 @@ const EducationSection = ({ doctorData }) => {
           </div>
         </div>
       ))}
-    </Card>
+    </div>
   );
 };
 
