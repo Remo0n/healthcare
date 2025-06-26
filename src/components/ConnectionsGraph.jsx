@@ -191,9 +191,7 @@ const ConnectionsGraph = () => {
           }
           nodeVal={(node) => node.val}
           linkLabel={(link) =>
-            `Connection between ${link.source.name || link.source} and ${
-              link.target.name || link.target
-            }`
+            `${link.type}`
           }
           linkWidth={(link) => link.value}
           linkColor={() => "#C6CDF4"}
