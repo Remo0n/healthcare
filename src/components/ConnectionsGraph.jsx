@@ -102,7 +102,7 @@ const ConnectionsGraph = () => {
   useEffect(() => {
     if (forceGraphRef.current && graphData.nodes.length > 0) {
       const fg = forceGraphRef.current;
-      fg.d3Force("link").distance(50).strength(0.5);
+      fg.d3Force("link").distance(120).strength(0.5);
       fg.d3ReheatSimulation();
     }
   }, [graphData, dimensions]);
