@@ -24,6 +24,11 @@ const initialState = {
   hcps: [],
   connections: [],
   
+  // Search functionality
+  searchQuery: '',
+  searchResults: [],
+  selectedSearchResult: null,
+  
   // Loading state
   loading: false,
   
@@ -36,6 +41,35 @@ const hcpSlice = createSlice({
   name: 'hcp',
   initialState,
   reducers: {
+    // Search functionality
+    setSearchQuery: (state, action) => {
+      state.searchQuery = action.payload;
+      
+      // Perform search if query is not empty
+      if (action.payload.trim()) {
+        const query = action.payload.toLowerCase();
+        state.searchResults = state.hcps.filter(hcp => 
+          hcp.name.toLowerCase().includes(query) ||
+          hcp.title.toLowerCase().includes(query) ||
+          hcp.location.toLowerCase().includes(query) ||
+          hcp.specialty?.toLowerCase().includes(query)
+        );
+      } else {
+        state.searchResults = [];
+        state.selectedSearchResult = null;
+      }
+    },
+    
+    setSelectedSearchResult: (state, action) => {
+      state.selectedSearchResult = action.payload;
+    },
+    
+    clearSearch: (state) => {
+      state.searchQuery = '';
+      state.searchResults = [];
+      state.selectedSearchResult = null;
+    },
+    
     // Clear errors
     clearErrors: (state) => {
       state.error = null;
@@ -66,6 +100,9 @@ const hcpSlice = createSlice({
 
 // Export actions
 export const {
+  setSearchQuery,
+  setSelectedSearchResult,
+  clearSearch,
   clearErrors,
   resetHcpState
 } = hcpSlice.actions;
@@ -75,5 +112,8 @@ export const selectAllHcps = (state) => state.hcp.hcps;
 export const selectAllConnections = (state) => state.hcp.connections;
 export const selectHcpLoading = (state) => state.hcp.loading;
 export const selectHcpError = (state) => state.hcp.error;
+export const selectSearchQuery = (state) => state.hcp.searchQuery;
+export const selectSearchResults = (state) => state.hcp.searchResults;
+export const selectSelectedSearchResult = (state) => state.hcp.selectedSearchResult;
 
 export default hcpSlice.reducer;

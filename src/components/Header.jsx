@@ -1,10 +1,54 @@
-import React from "react";
-import { Avatar, Button, Input, Switch } from "antd";
+import React, { useState } from "react";
+import { Avatar, Button, Input, Switch, AutoComplete } from "antd";
 import { SearchOutlined, FilterOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSearchQuery,
+  setSelectedSearchResult,
+  selectSearchResults,
+  selectSearchQuery
+} from "../store/slices/hcpSlice";
 
 const { Search } = Input;
 
 const Header = ({ doctorData }) => {
+  const dispatch = useDispatch();
+  const searchResults = useSelector(selectSearchResults);
+  const searchQuery = useSelector(selectSearchQuery);
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleSearch = (value) => {
+    setSearchValue(value);
+    dispatch(setSearchQuery(value));
+  };
+
+  const handleSelect = (value, option) => {
+    const selectedHcp = searchResults.find(hcp => hcp.id === option.key);
+    if (selectedHcp) {
+      dispatch(setSelectedSearchResult(selectedHcp));
+      setSearchValue(selectedHcp.name);
+    }
+  };
+
+  // Format search results for AutoComplete
+  const searchOptions = searchResults.map(hcp => ({
+    value: hcp.name,
+    label: (
+      <div className="flex items-center space-x-2">
+        <img 
+          src={hcp.avatar} 
+          alt={hcp.name}
+          className="w-6 h-6 rounded-full"
+        />
+        <div>
+          <div className="font-medium">{hcp.name}</div>
+          <div className="text-xs text-gray-500">{hcp.title} - {hcp.location}</div>
+        </div>
+      </div>
+    ),
+    key: hcp.id
+  }));
+
   return (
     <>
       <div>
@@ -19,7 +63,7 @@ const Header = ({ doctorData }) => {
                 <h2 className="text-base font-semibold text-gray-900">
                   {doctorData.name}
                 </h2>
-                <span className="text-xs tracking-tighter	 font-light text-gray-900">
+                <span className="text-xs tracking-tighter font-light text-gray-900">
                   Cardiologist at NHOG
                 </span>
               </div>
@@ -57,11 +101,16 @@ const Header = ({ doctorData }) => {
       </div>
       <div className="bg-white px-4 py-2 mt-2 shadow-sm border-b rounded-xl">
         <div className="flex items-center space-x-3">
-          <Search
-            placeholder="Search"
+          <AutoComplete
             className="w-64"
-            prefix={<SearchOutlined />}
-          />
+            options={searchOptions}
+            onSearch={handleSearch}
+            onSelect={handleSelect}
+            value={searchValue}
+            placeholder="Search HCPs..."
+          >
+            <Input prefix={<SearchOutlined />} />
+          </AutoComplete>
           <Button icon={<FilterOutlined />} className="border-gray-300">
             Filter
           </Button>

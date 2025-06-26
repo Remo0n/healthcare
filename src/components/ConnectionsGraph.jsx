@@ -7,6 +7,8 @@ import {
   selectAllConnections,
   selectHcpLoading,
   selectHcpError,
+  selectSelectedSearchResult,
+  setSelectedSearchResult
 } from "../store/slices/hcpSlice";
 
 import { setHcpProfileDetails } from "../store/slices/hcpProfileDetailsSlice";
@@ -17,6 +19,7 @@ const ConnectionsGraph = () => {
   const connections = useSelector(selectAllConnections);
   const loading = useSelector(selectHcpLoading);
   const error = useSelector(selectHcpError);
+  const selectedSearchResult = useSelector(selectSelectedSearchResult);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
   const forceGraphRef = useRef(null);
@@ -24,6 +27,20 @@ const ConnectionsGraph = () => {
   useEffect(() => {
     dispatch(fetchAllHcps());
   }, [dispatch]);
+
+  // Handle search result selection
+  useEffect(() => {
+    if (selectedSearchResult && forceGraphRef.current) {
+      // Find the node in the graph data
+      const targetNode = graphData.nodes.find(node => node.id === selectedSearchResult.id);
+      if (targetNode) {
+        // Simulate node click
+        handleNodeClick(targetNode);
+        // Clear the selected search result
+        dispatch(setSelectedSearchResult(null));
+      }
+    }
+  }, [selectedSearchResult, dispatch]);
 
   // Handle container resize
   useEffect(() => {
@@ -161,7 +178,7 @@ const ConnectionsGraph = () => {
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full left-0 right-0 top-0 bottom-0 absolute overflow-hidden">
+    <div ref={containerRef} className="w-full h-full left-0 right-0 absolute overflow-hidden">
       {dimensions.width > 0 && dimensions.height > 0 && (
         <ForceGraph2D
           ref={forceGraphRef}
