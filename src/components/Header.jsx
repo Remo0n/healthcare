@@ -100,18 +100,18 @@ const Header = ({ doctorData }) => {
         </div>
       </div>
       <div className="bg-white px-4 py-2 mt-2 shadow-sm border-b rounded-xl">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 gap-4">
           <AutoComplete
-            className="w-64"
+            className="w-4/5"
             options={searchOptions}
             onSearch={handleSearch}
             onSelect={handleSelect}
             value={searchValue}
             placeholder="Search HCPs..."
           >
-            <Input prefix={<SearchOutlined />} />
+            <Input className="placeholder:ml-6" prefix={<SearchOutlined />} />
           </AutoComplete>
-          <Button icon={<FilterOutlined />} className="border-gray-300">
+          <Button icon={<FilterOutlined />} className="border-gray-300 w-1/5">
             Filter
           </Button>
         </div>

@@ -72,3 +72,7 @@ body {
 .ant-card {
   border-radius: 12px !important;
 }
+
+.ant-select-selection-placeholder {
+  padding-left: 32px !important;
+}
