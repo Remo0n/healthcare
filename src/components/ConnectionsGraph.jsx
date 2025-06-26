@@ -18,11 +18,49 @@ const ConnectionsGraph = () => {
   const loading = useSelector(selectHcpLoading);
   const error = useSelector(selectHcpError);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [imageCache, setImageCache] = useState(new Map());
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const containerRef = useRef(null);
+  const forceGraphRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchAllHcps());
   }, [dispatch]);
+
+  // Preload images
+  useEffect(() => {
+    if (!hcps || hcps.length === 0) return;
+
+    const loadImages = async () => {
+      const cache = new Map();
+      const imagePromises = hcps.map((hcp) => {
+        return new Promise((resolve) => {
+          if (!hcp.avatar) {
+            resolve();
+            return;
+          }
+
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => {
+            cache.set(hcp.id, img);
+            resolve();
+          };
+          img.onerror = () => {
+            console.warn(`Failed to load image for ${hcp.name}`);
+            resolve();
+          };
+          img.src = hcp.avatar;
+        });
+      });
+
+      await Promise.all(imagePromises);
+      setImageCache(cache);
+      setImagesLoaded(true);
+    };
+
+    loadImages();
+  }, [hcps]);
 
   // Handle container resize
   useEffect(() => {
@@ -73,8 +111,6 @@ const ConnectionsGraph = () => {
       successRate: hcp.successRate,
       bio:hcp.bio,
       specialty:hcp.specialty,
-      
-      
     }));
 
     const links = connections.map((connection) => ({
@@ -87,7 +123,7 @@ const ConnectionsGraph = () => {
     }));
 
     return { nodes, links };
-  }, [hcps]);
+  }, [hcps, connections]);
 
   if (loading) {
     return (
@@ -105,39 +141,72 @@ const ConnectionsGraph = () => {
     );
   }
 
+  if (!imagesLoaded) {
+    return (
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl h-full flex items-center justify-center">
+        <div className="text-gray-500">Loading images...</div>
+      </div>
+    );
+  }
+
   const nodeCanvas = (node, ctx, globalScale) => {
-            if (node.avatar) {
-              const size = 12;
-              const img = new Image();
-              img.src = node.avatar;
+    const img = imageCache.get(node.id);
+    if (img) {
+      const size = 26;
+      const x = node.x;
+      const y = node.y;
+      const radius = size / 2;
 
-              img.onload = () => {
-                const x = node.x;
-                const y = node.y;
-                const radius = size / 2;
+      // Save context state
+      ctx.save();
 
-                // Save context state
-                ctx.save();
+      // Draw circular clipping path
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+      ctx.closePath();
+      ctx.clip();
 
-                // Draw circular clipping path
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-                ctx.closePath();
-                ctx.clip();
+      // Draw image inside the clipped circle
+      ctx.drawImage(img, x - radius, y - radius, size, size);
 
-                // Draw image inside the clipped circle
-                ctx.drawImage(img, x - radius, y - radius, size, size);
+      // Restore context to remove clipping
+      ctx.restore();
 
-                // Restore context to remove clipping
-                ctx.restore();
-              };
-            }
-          }
+      // Draw border
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else {
+      // Fallback: draw a colored circle if image not available
+      const size = 26;
+      const radius = size / 2;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = '#6366f1';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  };
+
+  const handleNodeClick = (node) => {
+    // Center the clicked node in the middle of the view
+    if (forceGraphRef.current) {
+      forceGraphRef.current.centerAt(node.x, node.y, 1000);
+    }
+    
+    // Dispatch the profile details
+    dispatch(setHcpProfileDetails({...node, activeData: true}));
+  };
 
   return (
     <div ref={containerRef} className="w-full h-full left-0 right-0 top-0 bottom-0 absolute overflow-hidden">
       {dimensions.width > 0 && dimensions.height > 0 && (
         <ForceGraph2D
+          ref={forceGraphRef}
           graphData={graphData}
           width={dimensions.width}
           height={dimensions.height}
@@ -152,11 +221,9 @@ const ConnectionsGraph = () => {
             }`
           }
           linkWidth={(link) => link.value}
-          linkColor={() => "#cbd5e1"}
-          backgroundColor="transparent"
-          onNodeClick={(node) => {
-            dispatch(setHcpProfileDetails({...node, activeData: true}))
-          }}
+          linkColor={() => "#C6CDF4"}
+          backgroundColor="#fff"
+          onNodeClick={handleNodeClick}
           onLinkClick={(link) => {
             console.log("Clicked link:", link);
           }}
