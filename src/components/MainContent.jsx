@@ -13,7 +13,7 @@ const MainContent = ({ doctorData }) => {
       {activeData && <div className="flex flex-col gap-3 flex-1 space-y-6">
         <ProfileDetails doctorData={doctorData} />
       </div>}
-      <div className={`${activeData ? 'w-2/3 relative': 'w-full'} `}>
+      <div className={`${activeData ? 'w-2/3': 'w-full h-[calc(100vh_-_260px)]'} relative`}>
         <ConnectionsGraph />
       </div>
     </div>

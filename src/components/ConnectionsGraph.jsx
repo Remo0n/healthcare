@@ -191,7 +191,7 @@ const ConnectionsGraph = () => {
   };
 
   return (
-    <div className="flex h-full w-full absolute right-0 left-0 overflow-hidden">
+    <div className="flex h-full w-full">
       <div
         ref={containerRef}
         className={`flex-1 overflow-hidden transition-all duration-300`}
