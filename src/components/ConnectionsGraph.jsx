@@ -12,6 +12,7 @@ import {
 } from "../store/slices/hcpSlice";
 
 import { setHcpProfileDetails } from "../store/slices/hcpProfileDetailsSlice";
+import ConnectionDetails from './ConnectionDetails';
 
 const ConnectionsGraph = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const ConnectionsGraph = () => {
   const error = useSelector(selectHcpError);
   const selectedSearchResult = useSelector(selectSelectedSearchResult);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [selectedConnection, setSelectedConnection] = useState(null);
   const containerRef = useRef(null);
   const forceGraphRef = useRef(null);
 
@@ -61,7 +63,7 @@ const ConnectionsGraph = () => {
       window.removeEventListener("resize", updateDimensions);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [selectedConnection]);
 
   const graphData = useMemo(() => {
     if (!hcps || hcps.length === 0 || !connections) {
@@ -168,32 +170,61 @@ const ConnectionsGraph = () => {
     dispatch(setHcpProfileDetails({ ...node, activeData: true }));
   };
 
+  const handleLinkClick = (link) => {
+    // Find the source and target nodes
+    const sourceNode = graphData.nodes.find(node => node.id === link.source.id || node.id === link.source);
+    const targetNode = graphData.nodes.find(node => node.id === link.target.id || node.id === link.target);
+    
+    setSelectedConnection({
+      connection: link,
+      sourceNode,
+      targetNode
+    });
+  };
+
+  const handleCloseConnectionDetails = () => {
+    setSelectedConnection(null);
+  };
+
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full left-0 right-0 absolute overflow-hidden"
-    >
-      {dimensions.width > 0 && dimensions.height > 0 && (
-        <ForceGraph2D
-          ref={forceGraphRef}
-          graphData={graphData}
-          width={dimensions.width}
-          height={dimensions.height}
-          nodeAutoColorBy="title"
-          nodeLabel={(node) =>
-            `${node.name}\n${node.title}\n${node.location}\nPatients: ${node.patientsServed}\nSuccess Rate: ${node.successRate}%`
-          }
-          nodeVal={(node) => node.val}
-          linkLabel={(link) => `${link.type}`}
-          linkWidth={(link) => link.value}
-          linkColor={() => "#C6CDF4"}
-          backgroundColor="#fff"
-          onNodeClick={handleNodeClick}
-          onLinkClick={(link) => {
-            console.log("Clicked link:", link);
-          }}
-          nodeCanvasObject={nodeCanvas}
-        />
+    <div className="flex h-full w-full relative">
+      <div
+        ref={containerRef}
+        className={`flex-1 overflow-hidden transition-all duration-300 ${
+          selectedConnection ? 'mr-80' : ''
+        }`}
+      >
+        {dimensions.width > 0 && dimensions.height > 0 && (
+          <ForceGraph2D
+            ref={forceGraphRef}
+            graphData={graphData}
+            width={dimensions.width}
+            height={dimensions.height}
+            nodeAutoColorBy="title"
+            nodeLabel={(node) =>
+              `${node.name}\n${node.title}\n${node.location}\nPatients: ${node.patientsServed}\nSuccess Rate: ${node.successRate}%`
+            }
+            nodeVal={(node) => node.val}
+            linkLabel={(link) => `${link.type}`}
+            linkWidth={(link) => link.value}
+            linkColor={() => "#C6CDF4"}
+            backgroundColor="#fff"
+            onNodeClick={handleNodeClick}
+            onLinkClick={handleLinkClick}
+            nodeCanvasObject={nodeCanvas}
+          />
+        )}
+      </div>
+      
+      {selectedConnection && (
+        <div className="fixed right-0 top-0 h-full z-40">
+          <ConnectionDetails
+            connection={selectedConnection.connection}
+            sourceNode={selectedConnection.sourceNode}
+            targetNode={selectedConnection.targetNode}
+            onClose={handleCloseConnectionDetails}
+          />
+        </div>
       )}
     </div>
   );
