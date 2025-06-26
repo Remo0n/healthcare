@@ -8,7 +8,7 @@ import {
   selectHcpLoading,
   selectHcpError,
   selectSelectedSearchResult,
-  setSelectedSearchResult
+  setSelectedSearchResult,
 } from "../store/slices/hcpSlice";
 
 import { setHcpProfileDetails } from "../store/slices/hcpProfileDetailsSlice";
@@ -28,21 +28,18 @@ const ConnectionsGraph = () => {
     dispatch(fetchAllHcps());
   }, [dispatch]);
 
-  // Handle search result selection
   useEffect(() => {
     if (selectedSearchResult && forceGraphRef.current) {
-      // Find the node in the graph data
-      const targetNode = graphData.nodes.find(node => node.id === selectedSearchResult.id);
+      const targetNode = graphData.nodes.find(
+        (node) => node.id === selectedSearchResult.id
+      );
       if (targetNode) {
-        // Simulate node click
         handleNodeClick(targetNode);
-        // Clear the selected search result
         dispatch(setSelectedSearchResult(null));
       }
     }
   }, [selectedSearchResult, dispatch]);
 
-  // Handle container resize
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -51,25 +48,21 @@ const ConnectionsGraph = () => {
       }
     };
 
-    // Initial measurement
     updateDimensions();
 
-    // Add resize listener
-    window.addEventListener('resize', updateDimensions);
-    
-    // Use ResizeObserver for more accurate container size changes
+    window.addEventListener("resize", updateDimensions);
+
     const resizeObserver = new ResizeObserver(updateDimensions);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
 
     return () => {
-      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener("resize", updateDimensions);
       resizeObserver.disconnect();
     };
   }, []);
 
-  // Format HCP data for ForceGraph2D
   const graphData = useMemo(() => {
     if (!hcps || hcps.length === 0 || !connections) {
       return {
@@ -78,7 +71,6 @@ const ConnectionsGraph = () => {
       };
     }
 
-    // Create nodes from HCP data
     const nodes = hcps.map((hcp) => ({
       id: hcp.id,
       name: hcp.name,
@@ -89,8 +81,8 @@ const ConnectionsGraph = () => {
       following: hcp.following,
       patientsServed: hcp.patientsServed,
       successRate: hcp.successRate,
-      bio:hcp.bio,
-      specialty:hcp.specialty,
+      bio: hcp.bio,
+      specialty: hcp.specialty,
     }));
 
     const links = connections.map((connection) => ({
@@ -98,12 +90,20 @@ const ConnectionsGraph = () => {
       target: connection.target,
       type: connection.type,
       details: connection.details,
-      value: 3, 
+      value: 3,
       label: connection.type,
     }));
 
     return { nodes, links };
   }, [hcps, connections]);
+
+  useEffect(() => {
+    if (forceGraphRef.current && graphData.nodes.length > 0) {
+      forceGraphRef.current.d3Force("link").distance(100);
+      forceGraphRef.current.d3Force("charge").strength(-300);
+      forceGraphRef.current.d3ReheatSimulation();
+    }
+  }, [graphData]);
 
   if (loading) {
     return (
@@ -127,58 +127,52 @@ const ConnectionsGraph = () => {
       const img = new Image();
       img.src = node.avatar;
 
-      // For local images, we can draw immediately since they load very fast
       const x = node.x;
       const y = node.y;
       const radius = size / 2;
 
-      // Save context state
       ctx.save();
 
-      // Draw circular clipping path
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
       ctx.closePath();
       ctx.clip();
 
-      // Draw image inside the clipped circle
       ctx.drawImage(img, x - radius, y - radius, size, size);
 
-      // Restore context to remove clipping
       ctx.restore();
 
-      // Draw border
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = "#fff";
       ctx.lineWidth = 2;
       ctx.stroke();
     } else {
-      // Fallback: draw a colored circle if image not available
       const size = 26;
       const radius = size / 2;
       ctx.beginPath();
       ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = '#6366f1';
+      ctx.fillStyle = "#6366f1";
       ctx.fill();
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = "#fff";
       ctx.lineWidth = 2;
       ctx.stroke();
     }
   };
 
   const handleNodeClick = (node) => {
-    // Center the clicked node in the middle of the view
     if (forceGraphRef.current) {
       forceGraphRef.current.centerAt(node.x, node.y, 1000);
     }
-    
-    // Dispatch the profile details
-    dispatch(setHcpProfileDetails({...node, activeData: true}));
+
+    dispatch(setHcpProfileDetails({ ...node, activeData: true }));
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full left-0 right-0 absolute overflow-hidden">
+    <div
+      ref={containerRef}
+      className="w-full h-full left-0 right-0 absolute overflow-hidden"
+    >
       {dimensions.width > 0 && dimensions.height > 0 && (
         <ForceGraph2D
           ref={forceGraphRef}
@@ -190,9 +184,7 @@ const ConnectionsGraph = () => {
             `${node.name}\n${node.title}\n${node.location}\nPatients: ${node.patientsServed}\nSuccess Rate: ${node.successRate}%`
           }
           nodeVal={(node) => node.val}
-          linkLabel={(link) =>
-            `${link.type}`
-          }
+          linkLabel={(link) => `${link.type}`}
           linkWidth={(link) => link.value}
           linkColor={() => "#C6CDF4"}
           backgroundColor="#fff"
