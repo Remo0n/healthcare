@@ -140,6 +140,7 @@ npm run preview
 
 # Run ESLint
 npm run lint
+```
 ## 🎯 Key Components
 ### ConnectionsGraph.jsx
 The core visualization component featuring:
