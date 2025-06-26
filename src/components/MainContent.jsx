@@ -12,7 +12,7 @@ const MainContent = ({ doctorData }) => {
       <div className="flex flex-col gap-3 flex-1 space-y-6">
       <ProfileDetails doctorData={doctorData}/>
       </div>
-      <div className="w-2/3">
+      <div className="w-2/3 relative">
         <ConnectionsGraph />
       </div>
     </div>
