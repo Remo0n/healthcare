@@ -68,6 +68,8 @@ This project fulfills the **Front-End Technical Challenge: Interactive Healthcar
 - **React Refresh**: Fast refresh during development
 
 ## 📁 Project Structure
+  
+```text
 healtcare/
 ├── public/
 │   ├── images/           # HCP profile images
@@ -106,9 +108,10 @@ healtcare/
 │   └── mockdata.json              # Mock HCP data
 ├── package.json                   # Dependencies and scripts
 ├── vite.config.js                 # Vite configuration
-├── eslint.config.js               # ESLint configuration
+├── eslint.config.js              # ESLint configuration
 └── index.html                     # HTML template
 
+```
 
 ## 🚀 Getting Started
 
