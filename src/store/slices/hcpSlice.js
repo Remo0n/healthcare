@@ -6,7 +6,7 @@ export const fetchAllHcps = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Fetch from mock data
-      const response = await fetch('/data/mockdata.json');
+      const response = await fetch('https://raw.githubusercontent.com/Remo0n/healthcare/refs/heads/main/data/mockdata.json');
       if (!response.ok) {
         throw new Error('Failed to fetch HCPs');
       }
