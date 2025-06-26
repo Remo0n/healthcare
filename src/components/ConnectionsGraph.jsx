@@ -12,7 +12,7 @@ import {
 } from "../store/slices/hcpSlice";
 
 import { setHcpProfileDetails } from "../store/slices/hcpProfileDetailsSlice";
-import ConnectionDetails from './ConnectionDetails';
+import ConnectionDetails from "./ConnectionDetails";
 
 const ConnectionsGraph = () => {
   const dispatch = useDispatch();
@@ -101,11 +101,12 @@ const ConnectionsGraph = () => {
 
   useEffect(() => {
     if (forceGraphRef.current && graphData.nodes.length > 0) {
-      forceGraphRef.current.d3Force("link").distance(100);
-      forceGraphRef.current.d3Force("charge").strength(-300);
-      forceGraphRef.current.d3ReheatSimulation();
+      const fg = forceGraphRef.current;
+      fg.d3Force("link").distance(150).strength(0.5);
+      fg.d3Force("charge").strength(-800).distanceMax(400);
+      fg.d3ReheatSimulation();
     }
-  }, [graphData]);
+  }, [graphData, dimensions]);
 
   if (loading) {
     return (
@@ -172,13 +173,17 @@ const ConnectionsGraph = () => {
 
   const handleLinkClick = (link) => {
     // Find the source and target nodes
-    const sourceNode = graphData.nodes.find(node => node.id === link.source.id || node.id === link.source);
-    const targetNode = graphData.nodes.find(node => node.id === link.target.id || node.id === link.target);
-    
+    const sourceNode = graphData.nodes.find(
+      (node) => node.id === link.source.id || node.id === link.source
+    );
+    const targetNode = graphData.nodes.find(
+      (node) => node.id === link.target.id || node.id === link.target
+    );
+
     setSelectedConnection({
       connection: link,
       sourceNode,
-      targetNode
+      targetNode,
     });
   };
 
@@ -187,12 +192,10 @@ const ConnectionsGraph = () => {
   };
 
   return (
-    <div className="flex h-full w-full relative">
+    <div className="flex h-full w-full absolute right-0 left-0 overflow-hidden">
       <div
         ref={containerRef}
-        className={`flex-1 overflow-hidden transition-all duration-300 ${
-          selectedConnection ? 'mr-80' : ''
-        }`}
+        className={`flex-1 overflow-hidden transition-all duration-300`}
       >
         {dimensions.width > 0 && dimensions.height > 0 && (
           <ForceGraph2D
@@ -212,10 +215,12 @@ const ConnectionsGraph = () => {
             onNodeClick={handleNodeClick}
             onLinkClick={handleLinkClick}
             nodeCanvasObject={nodeCanvas}
+            cooldownTicks={100}
+            cooldownTime={1500}
           />
         )}
       </div>
-      
+
       {selectedConnection && (
         <div className="fixed right-0 top-0 h-full z-40">
           <ConnectionDetails
