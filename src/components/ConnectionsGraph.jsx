@@ -18,49 +18,12 @@ const ConnectionsGraph = () => {
   const loading = useSelector(selectHcpLoading);
   const error = useSelector(selectHcpError);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [imageCache, setImageCache] = useState(new Map());
-  const [imagesLoaded, setImagesLoaded] = useState(false);
   const containerRef = useRef(null);
   const forceGraphRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchAllHcps());
   }, [dispatch]);
-
-  // Preload images
-  useEffect(() => {
-    if (!hcps || hcps.length === 0) return;
-
-    const loadImages = async () => {
-      const cache = new Map();
-      const imagePromises = hcps.map((hcp) => {
-        return new Promise((resolve) => {
-          if (!hcp.avatar) {
-            resolve();
-            return;
-          }
-
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => {
-            cache.set(hcp.id, img);
-            resolve();
-          };
-          img.onerror = () => {
-            console.warn(`Failed to load image for ${hcp.name}`);
-            resolve();
-          };
-          img.src = hcp.avatar;
-        });
-      });
-
-      await Promise.all(imagePromises);
-      setImageCache(cache);
-      setImagesLoaded(true);
-    };
-
-    loadImages();
-  }, [hcps]);
 
   // Handle container resize
   useEffect(() => {
@@ -141,18 +104,13 @@ const ConnectionsGraph = () => {
     );
   }
 
-  if (!imagesLoaded) {
-    return (
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl h-full flex items-center justify-center">
-        <div className="text-gray-500">Loading images...</div>
-      </div>
-    );
-  }
-
   const nodeCanvas = (node, ctx, globalScale) => {
-    const img = imageCache.get(node.id);
-    if (img) {
+    if (node.avatar) {
       const size = 26;
+      const img = new Image();
+      img.src = node.avatar;
+
+      // For local images, we can draw immediately since they load very fast
       const x = node.x;
       const y = node.y;
       const radius = size / 2;
