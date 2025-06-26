@@ -10,6 +10,8 @@
       "following": 124,
       "patientsServed": 1000,
       "successRate": 95,
+      "specialty": "Cardiologist",
+      "bio": "Experienced and compassionate doctor specializing in cardiology",
       "education": [
         {
           "institution": "Harvard Medical University",
@@ -43,6 +45,12 @@
       "title": "Cardiac Surgeon",
       "location": "USA",
       "avatar": "https://randomuser.me/api/portraits/men/35.jpg",
+      "peers": 122,
+      "following": 1224,
+      "patientsServed": 6050,
+      "successRate": 91,
+      "specialty": "Oncologist",
+      "bio": "Discover healing herbs, mindful living & natural wellness.",
       "education": [
         {
           "institution": "Stanford University",
@@ -72,6 +80,12 @@
       "title": "Internist",
       "location": "UK",
       "avatar": "https://randomuser.me/api/portraits/women/68.jpg",
+      "peers": 2323,
+      "following": 624,
+      "patientsServed": 870,
+      "successRate": 85,
+      "specialty": "Neurologist",
+      "bio": "Bringing balance with ancient Ayurvedic wisdom for modern lives.",
       "education": [
         {
           "institution": "Oxford University",

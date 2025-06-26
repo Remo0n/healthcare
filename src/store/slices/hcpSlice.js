@@ -11,7 +11,7 @@ export const fetchAllHcps = createAsyncThunk(
         throw new Error('Failed to fetch HCPs');
       }
       const data = await response.json();
-      return data.hcps;
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -22,6 +22,7 @@ export const fetchAllHcps = createAsyncThunk(
 const initialState = {
   // All HCPs data
   hcps: [],
+  connections: [],
   
   // Loading state
   loading: false,
@@ -53,7 +54,8 @@ const hcpSlice = createSlice({
       })
       .addCase(fetchAllHcps.fulfilled, (state, action) => {
         state.loading = false;
-        state.hcps = action.payload;
+        state.hcps = action.payload.hcps;
+        state.connections = action.payload.connections;
       })
       .addCase(fetchAllHcps.rejected, (state, action) => {
         state.loading = false;
@@ -70,6 +72,7 @@ export const {
 
 // Selectors
 export const selectAllHcps = (state) => state.hcp.hcps;
+export const selectAllConnections = (state) => state.hcp.connections;
 export const selectHcpLoading = (state) => state.hcp.loading;
 export const selectHcpError = (state) => state.hcp.error;
 
