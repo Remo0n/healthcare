@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,25 +17,39 @@ const ConnectionsGraph = () => {
   const connections = useSelector(selectAllConnections);
   const loading = useSelector(selectHcpLoading);
   const error = useSelector(selectHcpError);
-  const [selectedNode, setSelectedNode] = useState([]);
-  const [selectedLink, setSelectedLink] = useState([]);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchAllHcps());
   }, [dispatch]);
 
-  // Helper function to assign colors based on HCP title - MOVED BEFORE USAGE
-  const getNodeColor = (title) => {
-    const colors = {
-      Cardiologist: "#ef4444",
-      "Cardiac Surgeon": "#3b82f6",
-      Internist: "#10b981",
-      Neurologist: "#8b5cf6",
-      Oncologist: "#f59e0b",
-      Pediatrician: "#ec4899",
+  // Handle container resize
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { offsetWidth, offsetHeight } = containerRef.current;
+        setDimensions({ width: offsetWidth, height: offsetHeight });
+      }
     };
-    return colors[title] || "#6b7280";
-  };
+
+    // Initial measurement
+    updateDimensions();
+
+    // Add resize listener
+    window.addEventListener('resize', updateDimensions);
+    
+    // Use ResizeObserver for more accurate container size changes
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // Format HCP data for ForceGraph2D
   const graphData = useMemo(() => {
@@ -59,18 +73,16 @@ const ConnectionsGraph = () => {
       successRate: hcp.successRate,
       bio:hcp.bio,
       specialty:hcp.specialty,
-      // Add visual properties
-      val: Math.random() * 10 + 5, // Node size
-      color: getNodeColor(hcp.title),
+      
+      
     }));
 
-    // Use actual connections from mock data
     const links = connections.map((connection) => ({
       source: connection.source,
       target: connection.target,
       type: connection.type,
       details: connection.details,
-      value: 3, // Link strength
+      value: 3, 
       label: connection.type,
     }));
 
@@ -93,61 +105,64 @@ const ConnectionsGraph = () => {
     );
   }
 
-  return (
-    <div className="w-full h-full absolute overflow-hidden">
-      <ForceGraph2D
-        graphData={graphData}
-        nodeAutoColorBy="title"
-        nodeLabel={(node) =>
-          `${node.name}\n${node.title}\n${node.location}\nPatients: ${node.patientsServed}\nSuccess Rate: ${node.successRate}%`
-        }
-        nodeVal={(node) => node.val}
-        linkLabel={(link) =>
-          `Connection between ${link.source.name || link.source} and ${
-            link.target.name || link.target
-          }`
-        }
-        linkWidth={(link) => link.value}
-        linkColor={() => "#cbd5e1"}
-        backgroundColor="transparent"
-        // width={window.innerWidth}
-        // height={window.innerHeight}
-        onNodeClick={(node) => {
-          console.log("Clicked node:", node);
-          dispatch(setHcpProfileDetails({...node, activeData: true}))
-        }}
-        onLinkClick={(link) => {
-          console.log("Clicked link:", link);
-        }}
-        nodeCanvasObject={(node, ctx, globalScale) => {
-          if (node.avatar) {
-            const size = 12;
-            const img = new Image();
-            img.src = node.avatar;
+  const nodeCanvas = (node, ctx, globalScale) => {
+            if (node.avatar) {
+              const size = 12;
+              const img = new Image();
+              img.src = node.avatar;
 
-            img.onload = () => {
-              const x = node.x;
-              const y = node.y;
-              const radius = size / 2;
+              img.onload = () => {
+                const x = node.x;
+                const y = node.y;
+                const radius = size / 2;
 
-              // Save context state
-              ctx.save();
+                // Save context state
+                ctx.save();
 
-              // Draw circular clipping path
-              ctx.beginPath();
-              ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-              ctx.closePath();
-              ctx.clip();
+                // Draw circular clipping path
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+                ctx.closePath();
+                ctx.clip();
 
-              // Draw image inside the clipped circle
-              ctx.drawImage(img, x - radius, y - radius, size, size);
+                // Draw image inside the clipped circle
+                ctx.drawImage(img, x - radius, y - radius, size, size);
 
-              // Restore context to remove clipping
-              ctx.restore();
-            };
+                // Restore context to remove clipping
+                ctx.restore();
+              };
+            }
           }
-        }}
-      />
+
+  return (
+    <div ref={containerRef} className="w-full h-full left-0 right-0 top-0 bottom-0 absolute overflow-hidden">
+      {dimensions.width > 0 && dimensions.height > 0 && (
+        <ForceGraph2D
+          graphData={graphData}
+          width={dimensions.width}
+          height={dimensions.height}
+          nodeAutoColorBy="title"
+          nodeLabel={(node) =>
+            `${node.name}\n${node.title}\n${node.location}\nPatients: ${node.patientsServed}\nSuccess Rate: ${node.successRate}%`
+          }
+          nodeVal={(node) => node.val}
+          linkLabel={(link) =>
+            `Connection between ${link.source.name || link.source} and ${
+              link.target.name || link.target
+            }`
+          }
+          linkWidth={(link) => link.value}
+          linkColor={() => "#cbd5e1"}
+          backgroundColor="transparent"
+          onNodeClick={(node) => {
+            dispatch(setHcpProfileDetails({...node, activeData: true}))
+          }}
+          onLinkClick={(link) => {
+            console.log("Clicked link:", link);
+          }}
+          nodeCanvasObject={nodeCanvas}
+        />
+      )}
     </div>
   );
 };
