@@ -108,6 +108,110 @@
           "year": 2023
         }
       ]
+    },{
+      "id": "hcp-004",
+      "name": "Dr. Smith San",
+      "title": "Internist",
+      "location": "UK",
+      "avatar": "https://randomuser.me/api/portraits/men/68.jpg",
+      "peers": 232,
+      "following": 124,
+      "patientsServed": 870,
+      "successRate": 84,
+      "specialty": "Neurologist",
+      "bio": "Bringing balance with ancient Ayurvedic wisdom for modern lives.",
+      "education": [
+        {
+          "institution": "Oxford University",
+          "degree": "MBBS",
+          "specialization": "Internal Medicine",
+          "startDate": "2012-09",
+          "endDate": "2017-06"
+        }
+      ],
+      "workExperience": [
+        {
+          "hospital": "St Thomas' Hospital",
+          "role": "Internist",
+          "years": "2018–Present"
+        }
+      ],
+      "publications": [
+        {
+          "title": "Managing Hypertension in Adults",
+          "year": 2023
+        }
+      ]
+    },
+    {
+      "id": "hcp-005",
+      "name": "Dr. Amanda Reyle",
+      "title": "Internist",
+      "location": "UK",
+      "avatar": "https://randomuser.me/api/portraits/women/21.jpg",
+      "peers": 232,
+      "following": 124,
+      "patientsServed": 870,
+      "successRate": 84,
+      "specialty": "Neurologist",
+      "bio": "Bringing balance with ancient Ayurvedic wisdom for modern lives.",
+      "education": [
+        {
+          "institution": "Oxford University",
+          "degree": "MBBS",
+          "specialization": "Internal Medicine",
+          "startDate": "2012-09",
+          "endDate": "2017-06"
+        }
+      ],
+      "workExperience": [
+        {
+          "hospital": "St Thomas' Hospital",
+          "role": "Internist",
+          "years": "2018–Present"
+        }
+      ],
+      "publications": [
+        {
+          "title": "Managing Hypertension in Adults",
+          "year": 2023
+        }
+      ]
+    },
+    {
+      "id": "hcp-006",
+      "name": "Dr. Myle Khan",
+      "title": "Internist",
+      "location": "UK",
+      "avatar": "https://randomuser.me/api/portraits/women/22.jpg",
+      "peers": 232,
+      "following": 124,
+      "patientsServed": 870,
+      "successRate": 84,
+      "specialty": "Neurologist",
+      "bio": "Bringing balance with ancient Ayurvedic wisdom for modern lives.",
+      "education": [
+        {
+          "institution": "Oxford University",
+          "degree": "MBBS",
+          "specialization": "Internal Medicine",
+          "startDate": "2012-09",
+          "endDate": "2017-06"
+        }
+      ],
+      "workExperience": [
+        {
+          "hospital": "St Thomas' Hospital",
+          "role": "Internist",
+          "years": "2018–Present"
+        }
+      ],
+      "publications": [
+        {
+          "title": "Managing Hypertension in Adults",
+          "year": 2023
+        }
+      ]
     }
   ],
   "connections": [
@@ -135,6 +239,38 @@
     {
       "source": "hcp-002",
       "target": "hcp-003",
+      "type": "shared education",
+      "details": {
+        "institution": "Stanford Medical Workshop 2016"
+      }
+    },
+    {
+      "source": "hcp-002",
+      "target": "hcp-004",
+      "type": "shared education",
+      "details": {
+        "institution": "Stanford Medical Workshop 2016"
+      }
+    },
+    {
+      "source": "hcp-001",
+      "target": "hcp-005",
+      "type": "shared education",
+      "details": {
+        "institution": "Stanford Medical Workshop 2016"
+      }
+    },
+    {
+      "source": "hcp-005",
+      "target": "hcp-004",
+      "type": "shared education",
+      "details": {
+        "institution": "Stanford Medical Workshop 2016"
+      }
+    },
+    {
+      "source": "hcp-003",
+      "target": "hcp-006",
       "type": "shared education",
       "details": {
         "institution": "Stanford Medical Workshop 2016"
